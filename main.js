@@ -93,7 +93,7 @@ const loader = new GLTFLoader();
 let sofaModel = null;
 
 loader.load(
-  '/sofa.glb',
+  'sofa.glb',
   (gltf) => {
     sofaModel = gltf.scene;
     sofaModel.position.set(-3, -1.7, 0);
