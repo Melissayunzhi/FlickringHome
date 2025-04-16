@@ -123,7 +123,7 @@ loader.load(
 let smalltableModel = null;
 
 loader.load(
-  '/smalltable.glb',
+  'smalltable.glb',
   (gltf) => {
     smalltableModel = gltf.scene;
     smalltableModel.position.set(-6, -0, 5);
@@ -154,7 +154,7 @@ loader.load(
 let floorlampModel = null;
 
 loader.load(
-  '/floorlamp.glb',
+  'floorlamp.glb',
   (gltf) => {
     floorlampModel = gltf.scene;
     floorlampModel.position.set(-6, 6, -5);
@@ -204,7 +204,7 @@ loader.load(
 let starlampModel = null;
 
 loader.load(
-  '/starlamp.glb',
+  'starlamp.glb',
   (gltf) => {
     starlampModel = gltf.scene;
     starlampModel.position.set(6, 0, 1.5);
@@ -254,7 +254,7 @@ loader.load(
 let smallshelfModel = null;
 
 loader.load(
-  '/smallshelf.glb',
+  'smallshelf.glb',
   (gltf) => {
     smallshelfModel = gltf.scene;
     smallshelfModel.position.set(1.9, 0.4, 0);
@@ -286,7 +286,7 @@ loader.load(
 let foorrugModel = null;
 
 loader.load(
-  '/floorrug.glb',
+  'floorrug.glb',
   (gltf) => {
     foorrugModel = gltf.scene;
     foorrugModel.position.set(-2, 0, 0);
@@ -318,7 +318,7 @@ loader.load(
 let pillowsofaModel = null;
 
 loader.load(
-  '/pillowsofa.glb',
+  'pillowsofa.glb',
   (gltf) => {
     pillowsofaModel = gltf.scene;
     pillowsofaModel.position.set(-3, 0, -2);
@@ -345,7 +345,7 @@ loader.load(
 let tableModel = null;
 
 loader.load(
-  '/table.glb',
+  'table.glb',
   (gltf) => {
     tableModel = gltf.scene;
     tableModel.position.set(1.5, -0.05, 13.5);
@@ -372,7 +372,7 @@ loader.load(
 let magazineModel = null;
 
 loader.load(
-  '/magazine.glb',
+  'magazine.glb',
   (gltf) => {
     magazineModel = gltf.scene;
     magazineModel.position.set(0.5, -0.01, -2);
@@ -399,7 +399,7 @@ loader.load(
 let tvModel = null;
 
 loader.load(
-  '/tv.glb',
+  'tv.glb',
   (gltf) => {
     tvModel = gltf.scene;
     tvModel.position.set(-6, -1.5, -2);
@@ -426,7 +426,7 @@ loader.load(
 let radioModel = null;
 
 loader.load(
-  '/radio.glb',
+  'radio.glb',
   (gltf) => {
     radioModel = gltf.scene;
     radioModel.position.set(-3.5, -1.15, 9);
@@ -453,7 +453,7 @@ loader.load(
 let towelsofaModel = null;
 
 loader.load(
-  '/towelsofa.glb',
+  'towelsofa.glb',
   (gltf) => {
     towelsofaModel = gltf.scene;
     towelsofaModel.position.set(-3, 0.9, -0.3);
@@ -480,7 +480,7 @@ loader.load(
 let windowFrameModel = null;
 
 loader.load(
-  '/windowframe.glb',
+  'windowframe.glb',
   (gltf) => {
     windowFrameModel = gltf.scene;
     windowFrameModel.position.set(0, -2, 4);
@@ -507,7 +507,7 @@ loader.load(
 let windowModel = null;
 
 loader.load(
-  '/window.glb',
+  'window.glb',
   (gltf) => {
     windowModel = gltf.scene;
     windowModel.position.set(0, -2, 5);
@@ -540,7 +540,7 @@ loader.load(
 let smallplantModel = null;
 
 loader.load(
-  '/smallplant.glb',
+  'smallplant.glb',
   (gltf) => {
     smallplantModel = gltf.scene;
     smallplantModel.position.set(2, 0.85,-3.8);
@@ -566,7 +566,7 @@ loader.load(
 let curtainModel = null;
 
 loader.load(
-  '/curtain.glb',
+  'curtain.glb',
   (gltf) => {
     curtainModel = gltf.scene;
     curtainModel.position.set(-0.5, 0, -3.4);
@@ -591,7 +591,7 @@ loader.load(
 
 let frameModel = null;
 loader.load(
-    '/frame.glb', // Replace with your frame.glb path
+    'frame.glb', // Replace with your frame.glb path
     (gltf) => {
       frameModel = gltf.scene;
       // Position and scale the frame as desired
@@ -622,7 +622,7 @@ loader.load(
 let bedModel = null;
 
 loader.load(
-  '/bed.glb',
+  'bed.glb',
   (gltf) => {
     bedModel = gltf.scene;
     bedModel.position.set(1, 0,-1);
@@ -648,7 +648,7 @@ loader.load(
 let shelfModel = null;
 
 loader.load(
-  '/shelves.glb',
+  'shelves.glb',
   (gltf) => {
     shelfModel = gltf.scene;
     shelfModel.position.set(0.5, 2.3,-4);
@@ -676,7 +676,7 @@ loader.load(
 let bagModel = null;
 
 loader.load(
-  '/shoulderbag.glb',
+  'shoulderbag.glb',
   (gltf) => {
     bagModel = gltf.scene;
     bagModel.position.set(0.8, -.1, 8);
@@ -704,7 +704,7 @@ loader.load(
 let posterModel = null;
 
 loader.load(
-  '/posters.glb',
+  'posters.glb',
   (gltf) => {
     posterModel = gltf.scene;
     posterModel.position.set(1, 0,-1.5);
@@ -730,7 +730,7 @@ loader.load(
 let bedsheetModel = null;
 
 loader.load(
-  '/bedsheet.glb',
+  'bedsheet.glb',
   (gltf) => {
     bedsheetModel = gltf.scene;
     bedsheetModel.position.set(1, 0,-1);
@@ -756,7 +756,7 @@ loader.load(
 let bedpillowModel = null;
 
 loader.load(
-  '/bedpillow.glb',
+  'bedpillow.glb',
   (gltf) => {
     bedpillowModel = gltf.scene;
     bedpillowModel.position.set(1, 0,-1);
@@ -781,7 +781,7 @@ loader.load(
 let laptopModel = null;
 
 loader.load(
-  '/laptop.glb',
+  'laptop.glb',
   (gltf) => {
     laptopModel = gltf.scene;
     laptopModel.position.set(-0.4, -1,0);
@@ -832,7 +832,7 @@ console.log('Laptop Spotlight added at position:', laptopLight.position);
 let doorModel = null;
 
 loader.load(
-    '/door.glb',
+    'door.glb',
     (gltf) => {
         doorModel = gltf.scene;
         doorModel.position.set(15.15, 0, 2);
@@ -864,7 +864,7 @@ loader.load(
 let doorblockModel = null;
 
 loader.load(
-      '/doorblock.glb',
+      'doorblock.glb',
       (gltf) => {
         doorblockModel = gltf.scene;
         doorblockModel.position.set(-1, 0, 6);
