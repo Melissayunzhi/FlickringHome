@@ -20,7 +20,7 @@ camInfo.style.borderRadius = '4px';
 camInfo.style.fontFamily = 'monospace';
 document.body.appendChild(camInfo);
 
-let showCameraInfo = true; // Toggle this to turn on/off
+let showCameraInfo = false; // Toggle this to turn on/off
 const fontStyle = "IBM Plex Mono, monospace";
 
 
@@ -1519,16 +1519,16 @@ function animate(time) {
   // animateObjects();
 
 
-  if (showCameraInfo) {
-    const pos = camera.position;
-    const rot = camera.rotation;
-    camInfo.innerText = `
-      position: (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)})
-      rotation: (${rot.x.toFixed(2)}, ${rot.y.toFixed(2)}, ${rot.z.toFixed(2)})
-    `;
-    const lookTarget = getCameraLookAtTarget(camera);
-    lookTargetInfo.innerText = `camera.lookAt(${lookTarget.x.toFixed(2)}, ${lookTarget.y.toFixed(2)}, ${lookTarget.z.toFixed(2)})`;
-  }
+  // if (showCameraInfo) {
+  //   const pos = camera.position;
+  //   const rot = camera.rotation;
+  //   camInfo.innerText = `
+  //     position: (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)})
+  //     rotation: (${rot.x.toFixed(2)}, ${rot.y.toFixed(2)}, ${rot.z.toFixed(2)})
+  //   `;
+  //   const lookTarget = getCameraLookAtTarget(camera);
+  //   lookTargetInfo.innerText = `camera.lookAt(${lookTarget.x.toFixed(2)}, ${lookTarget.y.toFixed(2)}, ${lookTarget.z.toFixed(2)})`;
+  // }
   
   lightPivot.rotation.y += 0.002;
   renderer.render(scene, camera);
@@ -1542,16 +1542,16 @@ function getCameraLookAtTarget(camera, distance = 10) {
   return pos.add(dir.multiplyScalar(distance));
 }
 
-const lookAtTarget = getCameraLookAtTarget(camera);
-console.log('Use in preset:');
-console.log(`camera.lookAt(${lookAtTarget.x.toFixed(2)}, ${lookAtTarget.y.toFixed(2)}, ${lookAtTarget.z.toFixed(2)})`);
+// const lookAtTarget = getCameraLookAtTarget(camera);
+// console.log('Use in preset:');
+// console.log(`camera.lookAt(${lookAtTarget.x.toFixed(2)}, ${lookAtTarget.y.toFixed(2)}, ${lookAtTarget.z.toFixed(2)})`);
 
 
-document.addEventListener('keydown', (e) => {
-  if (e.key === tab) {
-    showCameraInfo = !showCameraInfo;
-    camInfo.style.display = showCameraInfo ? 'block' : 'none';
-  }
-});
+// document.addEventListener('keydown', (e) => {
+//   if (e.key === "c") {
+//     showCameraInfo = !showCameraInfo;
+//     camInfo.style.display = showCameraInfo ? 'block' : 'none';
+//   }
+// });
 
 renderer.setAnimationLoop(animate);
