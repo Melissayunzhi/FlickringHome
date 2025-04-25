@@ -7,6 +7,23 @@ import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockCont
 const apiKey = "1a26dfb5c8191081a0280122b5c054a6";
 const groupId = "68964585@N00"; // Target Flickr Group ID (or use a gallery ID for curated images)
 
+const camInfo = document.createElement('div');
+camInfo.style.position = 'absolute';
+camInfo.style.bottom = '10px';
+camInfo.style.left = '10px';
+camInfo.style.backgroundColor = 'rgba(0,0,0,0.7)';
+camInfo.style.color = 'white';
+camInfo.style.padding = '6px 10px';
+camInfo.style.fontSize = '12px';
+camInfo.style.zIndex = 1000;
+camInfo.style.borderRadius = '4px';
+camInfo.style.fontFamily = 'monospace';
+document.body.appendChild(camInfo);
+
+let showCameraInfo = true; // Toggle this to turn on/off
+const fontStyle = "IBM Plex Mono, monospace";
+
+
 
 
 // 1. Hover Highlights
@@ -77,15 +94,16 @@ wall3.castShadow = true;
 scene.add(wall3);
 
 // Grid Helper
-const gridHelper = new THREE.GridHelper(15, 40);
-scene.add(gridHelper);
+// const gridHelper = new THREE.GridHelper(15, 40);
+// scene.add(gridHelper);
 
 // Raycaster Setup for Texture Interaction (existing functionality)
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let hoveredWall = null;
 let changeTextureInterval = null;
-
+setFlickrBackground();
+  
 // GLTFLoader for 3D Models
 const loader = new GLTFLoader();
 
@@ -415,7 +433,7 @@ loader.load(
         }
       }
     });
-    applyFlickrTextureToGLB(tvModel);
+    applyPhotoToTV(tvModel);
     scene.add(tvModel);
     console.log('tv Model loaded:', tvModel);
   },
@@ -894,25 +912,48 @@ loader.load(
     );
 
 
+// async function fetchRandomPhoto() {
+//   const randomPage = Math.floor(Math.random() * 10) + 1;
+//   const apiUrl = `https://www.flickr.com/services/rest/?method=flickr.groups.pools.getPhotos&api_key=${apiKey}&group_id=${groupId}&format=json&nojsoncallback=1&per_page=50&page=${randomPage}`;
+//   try {
+//     const response = await fetch(apiUrl);
+//     const data = await response.json();
+//     const photos = data.photos.photo;
+//     if (photos.length > 0) {
+//       const randomIndex = Math.floor(Math.random() * photos.length);
+//       const photo = photos[randomIndex];
+//       const imageUrl = `https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg`;
+//       console.log("Fetched Flickr URL:", imageUrl);  // <--- LOG HERE
+//       return imageUrl;
+//     }
+//   } catch (error) {
+//     console.error("Error fetching random group photo:", error);
+//   }
+//   return null;
+// }
 async function fetchRandomPhoto() {
   const randomPage = Math.floor(Math.random() * 10) + 1;
-  const apiUrl = `https://www.flickr.com/services/rest/?method=flickr.groups.pools.getPhotos&api_key=${apiKey}&group_id=${groupId}&format=json&nojsoncallback=1&per_page=50&page=${randomPage}`;
+  const apiUrl = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=home&min_upload_date=2004-01-01&max_upload_date=2
+  -12-31&format=json&nojsoncallback=1&per_page=50&page=${randomPage}`;
+
   try {
     const response = await fetch(apiUrl);
     const data = await response.json();
     const photos = data.photos.photo;
+
     if (photos.length > 0) {
       const randomIndex = Math.floor(Math.random() * photos.length);
       const photo = photos[randomIndex];
       const imageUrl = `https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg`;
-      console.log("Fetched Flickr URL:", imageUrl);  // <--- LOG HERE
       return imageUrl;
     }
   } catch (error) {
-    console.error("Error fetching random group photo:", error);
+    console.error("Error fetching home-tagged photo:", error);
   }
   return null;
 }
+
+
 
 const placeholderTexture = new THREE.TextureLoader().load('path/to/placeholder.jpg'); // Provide a valid local path if needed
 
@@ -1004,6 +1045,8 @@ function isDescendant(obj, parent) {
         changeTextureInterval = setInterval(() => {
           if (target === floorMesh) {
             applyPhotoToFloor(target);
+          } else if (target === tvModel) {
+            applyPhotoToTV(target);
           } else if (windowModel && target === windowModel) {
             applyPhotoToWindow(target);
           } else if (target === sofaModel || target === frameModel || target === pillowsofaModel || target === towelsofaModel) {
@@ -1027,6 +1070,10 @@ function isDescendant(obj, parent) {
 // // Lighting Setup
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.3); // Reduced intensity for ambient light
  scene.add(ambientLight);
+ const warmAmbient = new THREE.AmbientLight(0xffdab9, 0.5); // Peach Puff color, subtle intensity
+ scene.add(warmAmbient);
+ 
+ scene.fog = new THREE.Fog(0x141414, 15, 50);
 
 // const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
 // directionalLight.position.set(5, 10, 15); // Positioned at an angle
@@ -1074,6 +1121,26 @@ spotLight.position.set(10, 20, 10);
 spotLight.castShadow = true;
 scene.add(spotLight);
 
+async function setFlickrBackground() {
+  const randomPage = Math.floor(Math.random() * 10) + 1;
+  const apiUrl = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=home&min_upload_date=2005-01-01&max_upload_date=2015-12-31&format=json&nojsoncallback=1&per_page=50&page=${randomPage}`;
+  
+  try {
+    const res = await fetch(apiUrl);
+    const data = await res.json();
+    const photos = data.photos.photo;
+
+    if (photos.length > 0) {
+      const photo = photos[Math.floor(Math.random() * photos.length)];
+      const imageUrl = `https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg`;
+
+      document.getElementById('flickr-bg').style.backgroundImage = `url(${imageUrl})`;
+      console.log('Flickr background set to:', imageUrl);
+    }
+  } catch (err) {
+    console.error("Failed to load background image:", err);
+  }
+}
 
 
 
@@ -1101,10 +1168,11 @@ async function applyFlickrTextureToGLB(object) {
           imageUrl,
           (texture) => {
             console.log("Texture loaded, applying to:", child.name);
-            if (object === sofaModel || isDescendant(child, windowModel)) {
+            if (object === sofaModel  || isDescendant(child, windowModel)) {
                 texture.center.set(0.5, 0.5);  // Set the pivot to the texture's center
                 texture.rotation = Math.PI ; // Random rotation between 0 and 360 degrees
               }
+
             texture.encoding = THREE.sRGBEncoding;
             child.material.map = texture;
             child.material.needsUpdate = true;
@@ -1161,7 +1229,8 @@ function applyFlickrTextureToMesh(child) {
   
   async function fetchTagPhoto(tag) {
     const randomPage = Math.floor(Math.random() * 10) + 1;
-    const apiUrl = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=${tag}&format=json&nojsoncallback=1&per_page=50&page=${randomPage}`;
+    const apiUrl = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=${tag}&min_upload_date=2004-01-01&max_upload_date=2014-12-31&format=json&nojsoncallback=1&per_page=50&page=${randomPage}`;
+  
     try {
       const response = await fetch(apiUrl);
       const data = await response.json();
@@ -1178,6 +1247,7 @@ function applyFlickrTextureToMesh(child) {
     }
     return null;
   }
+  
   
   function applyPhotoToFloor(mesh) {
     fetchTagPhoto("flooring").then((imageUrl) => {
@@ -1230,6 +1300,38 @@ function applyFlickrTextureToMesh(child) {
       });
     });
   }
+  function applyPhotoToTV(mesh) {
+    fetchTagPhoto("home").then((imageUrl) => {
+      const textureLoader = new THREE.TextureLoader();
+      const texture = imageUrl ? textureLoader.load(imageUrl) : placeholderTexture;
+  
+      // Center the texture pivot and flip 180°
+      texture.center.set(0.5, 0.5);
+      texture.rotation = Math.PI;
+  
+      mesh.traverse(child => {
+        if (child.isMesh) {
+          if (!child.material) {
+            child.material = new THREE.MeshStandardMaterial({ 
+              color: 0xffffff,
+              metalness: 0,
+              roughness: 1
+            });
+          }
+          if (Array.isArray(child.material)) {
+            child.material.forEach(mat => {
+              mat.map = texture;
+              mat.needsUpdate = true;
+            });
+          } else {
+            child.material.map = texture;
+            child.material.needsUpdate = true;
+          }
+        }
+      });
+    });
+  }
+  
   const tagInput = document.createElement('input');
   tagInput.placeholder = "Enter #tag (e.g. #clouds)";
   tagInput.style.position = 'absolute';
@@ -1295,6 +1397,47 @@ document.addEventListener('keyup', (event) => {
   }
 });
 
+const buttonStyles = `
+
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 100;
+  margin: 4px;
+  padding: 5px 10px;
+`;
+
+['overview', 'sofa view', 'bed view'].forEach((label, i) => {
+  const btn = document.createElement('button');
+  btn.innerText = label;
+  btn.style.cssText = buttonStyles;
+  btn.style.top = `${10 + i * 50}px`; // Stack vertically
+  btn.addEventListener('click', () => setCameraView(i));
+  document.body.appendChild(btn);
+});
+document.querySelectorAll("button").forEach(btn => {
+  btn.style.fontFamily = fontStyle;
+});
+
+function setCameraView(viewIndex) {
+  switch (viewIndex) {
+    case 0:
+      camera.position.set(5, 8, 15);
+      camera.lookAt(0, 3, 0);
+      break;
+    case 1:
+      camera.position.set (-7.00, 5.39, 4.52);
+      camera.lookAt (0.09, 1.13, -1.09)
+      break;
+    case 2:
+      camera.position.set(6.82, 2.69, -5.03);
+      camera.lookAt(-0.97, 1.72, 1.16);
+      break;
+  }
+  camera.updateProjectionMatrix();
+}
+
+
 // // 2. Camera Flythrough (Cinematic Intro)
 // const flythroughPoints = [
 //   new THREE.Vector3(10, 5, 20),
@@ -1325,6 +1468,19 @@ document.addEventListener('keyup', (event) => {
 //     flyStart = time;
 //   }
 // }
+
+const lookTargetInfo = document.createElement('div');
+lookTargetInfo.style.position = 'absolute';
+lookTargetInfo.style.bottom = '60px';
+lookTargetInfo.style.left = '10px';
+lookTargetInfo.style.backgroundColor = 'rgba(0,0,0,0.7)';
+lookTargetInfo.style.color = 'white';
+lookTargetInfo.style.padding = '6px 10px';
+lookTargetInfo.style.fontSize = '12px';
+lookTargetInfo.style.zIndex = 1000;
+lookTargetInfo.style.borderRadius = '4px';
+lookTargetInfo.style.fontFamily = 'monospace';
+document.body.appendChild(lookTargetInfo);
 
 const clock = new THREE.Clock();
 function animateObjects() {
@@ -1361,7 +1517,41 @@ function animate(time) {
   }
   // if (flying) animateFlythrough(time);
   // animateObjects();
+
+
+  if (showCameraInfo) {
+    const pos = camera.position;
+    const rot = camera.rotation;
+    camInfo.innerText = `
+      position: (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)})
+      rotation: (${rot.x.toFixed(2)}, ${rot.y.toFixed(2)}, ${rot.z.toFixed(2)})
+    `;
+    const lookTarget = getCameraLookAtTarget(camera);
+    lookTargetInfo.innerText = `camera.lookAt(${lookTarget.x.toFixed(2)}, ${lookTarget.y.toFixed(2)}, ${lookTarget.z.toFixed(2)})`;
+  }
+  
   lightPivot.rotation.y += 0.002;
   renderer.render(scene, camera);
 }
+
+// Helper: get world position the camera is looking at
+function getCameraLookAtTarget(camera, distance = 10) {
+  const dir = new THREE.Vector3(); // direction vector
+  camera.getWorldDirection(dir);  // get current direction
+  const pos = camera.position.clone(); // current position
+  return pos.add(dir.multiplyScalar(distance));
+}
+
+const lookAtTarget = getCameraLookAtTarget(camera);
+console.log('Use in preset:');
+console.log(`camera.lookAt(${lookAtTarget.x.toFixed(2)}, ${lookAtTarget.y.toFixed(2)}, ${lookAtTarget.z.toFixed(2)})`);
+
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === tab) {
+    showCameraInfo = !showCameraInfo;
+    camInfo.style.display = showCameraInfo ? 'block' : 'none';
+  }
+});
+
 renderer.setAnimationLoop(animate);

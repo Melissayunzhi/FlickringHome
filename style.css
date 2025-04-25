@@ -2,6 +2,9 @@ body {
     margin: 0;
 overflow: hidden;
 background: linear-gradient(to bottom, #141414, #505557);
+    font-family: 'IBM Plex Mono', monospace;
+  
+  
 }
 
 
@@ -9,3 +12,16 @@ background: linear-gradient(to bottom, #141414, #505557);
     width: 100vw;
     height: 100vh;
 }
+
+#flickr-bg {
+    position: fixed;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.3) blur(10px);
+    z-index: -2;
+  }
+  #flickr-bg {
+    transition: background-image 1s ease;
+  }
+    
