@@ -19,6 +19,8 @@ camInfo.style.zIndex = 1000;
 camInfo.style.borderRadius = '4px';
 camInfo.style.fontFamily = 'monospace';
 document.body.appendChild(camInfo);
+camInfo.style.display = 'none';
+
 
 let showCameraInfo = false; // Toggle this to turn on/off
 const fontStyle = "IBM Plex Mono, monospace";
@@ -933,8 +935,7 @@ loader.load(
 // }
 async function fetchRandomPhoto() {
   const randomPage = Math.floor(Math.random() * 10) + 1;
-  const apiUrl = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=home&min_upload_date=2004-01-01&max_upload_date=2
-  -12-31&format=json&nojsoncallback=1&per_page=50&page=${randomPage}`;
+  const apiUrl = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=home&min_upload_date=2004-01-01&max_upload_date=2012-12-31&format=json&nojsoncallback=1&per_page=50&page=${randomPage}`;
 
   try {
     const response = await fetch(apiUrl);
@@ -1229,7 +1230,7 @@ function applyFlickrTextureToMesh(child) {
   
   async function fetchTagPhoto(tag) {
     const randomPage = Math.floor(Math.random() * 10) + 1;
-    const apiUrl = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=${tag}&min_upload_date=2004-01-01&max_upload_date=2014-12-31&format=json&nojsoncallback=1&per_page=50&page=${randomPage}`;
+    const apiUrl = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=${tag}&min_upload_date=2004-01-01&max_upload_date=2012-12-31&format=json&nojsoncallback=1&per_page=50&page=${randomPage}`;
   
     try {
       const response = await fetch(apiUrl);
@@ -1338,7 +1339,15 @@ function applyFlickrTextureToMesh(child) {
   tagInput.style.top = '10px';
   tagInput.style.left = '10px';
   tagInput.style.zIndex = 100;
-  tagInput.style.padding = '5px';
+  tagInput.style.margin = '4px';
+  tagInput.style.padding = '5px 10px';
+  tagInput.style.fontFamily = fontStyle;
+  tagInput.style.backgroundColor = '#fff';
+  // tagInput.style.border = '1px solid #ccc';
+  tagInput.style.borderRadius = '4px';
+  tagInput.style.fontSize = '14px';
+  tagInput.style.outline = 'none';
+  
   document.body.appendChild(tagInput);
   
   tagInput.addEventListener('change', () => {
@@ -1419,6 +1428,38 @@ document.querySelectorAll("button").forEach(btn => {
   btn.style.fontFamily = fontStyle;
 });
 
+const screenshotButton = document.createElement('button');
+screenshotButton.innerText = '📸 Screenshot';
+screenshotButton.style.position = 'absolute';
+screenshotButton.style.bottom = '10px';
+screenshotButton.style.left = '10px';
+screenshotButton.style.zIndex = 100;
+screenshotButton.style.padding = '5px 10px';
+screenshotButton.style.margin = '4px';
+screenshotButton.style.fontFamily = fontStyle;
+screenshotButton.style.backgroundColor = '#fff';
+screenshotButton.style.border = '1px solid #ccc';
+screenshotButton.style.borderRadius = '4px';
+screenshotButton.style.fontSize = '14px';
+screenshotButton.style.cursor = 'pointer';
+document.body.appendChild(screenshotButton);
+screenshotButton.addEventListener('click', () => {
+  renderer.render(scene, camera); // Make sure latest frame is drawn
+  const screenshot = renderer.domElement.toDataURL('image/png');
+  
+  const link = document.createElement('a');
+  link.href = screenshot;
+  link.download = 'screenshot.png';
+  link.click();
+});
+screenshotButton.addEventListener('mouseenter', () => {
+  screenshotButton.style.backgroundColor = '#eee';
+});
+screenshotButton.addEventListener('mouseleave', () => {
+  screenshotButton.style.backgroundColor = '#fff';
+});
+
+
 function setCameraView(viewIndex) {
   switch (viewIndex) {
     case 0:
@@ -1481,6 +1522,7 @@ lookTargetInfo.style.zIndex = 1000;
 lookTargetInfo.style.borderRadius = '4px';
 lookTargetInfo.style.fontFamily = 'monospace';
 document.body.appendChild(lookTargetInfo);
+lookTargetInfo.style.display = 'none';
 
 const clock = new THREE.Clock();
 function animateObjects() {
@@ -1519,16 +1561,16 @@ function animate(time) {
   // animateObjects();
 
 
-  // if (showCameraInfo) {
-  //   const pos = camera.position;
-  //   const rot = camera.rotation;
-  //   camInfo.innerText = `
-  //     position: (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)})
-  //     rotation: (${rot.x.toFixed(2)}, ${rot.y.toFixed(2)}, ${rot.z.toFixed(2)})
-  //   `;
-  //   const lookTarget = getCameraLookAtTarget(camera);
-  //   lookTargetInfo.innerText = `camera.lookAt(${lookTarget.x.toFixed(2)}, ${lookTarget.y.toFixed(2)}, ${lookTarget.z.toFixed(2)})`;
-  // }
+  if (showCameraInfo) {
+    const pos = camera.position;
+    const rot = camera.rotation;
+    camInfo.innerText = `
+      position: (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)})
+      rotation: (${rot.x.toFixed(2)}, ${rot.y.toFixed(2)}, ${rot.z.toFixed(2)})
+    `;
+    const lookTarget = getCameraLookAtTarget(camera);
+    lookTargetInfo.innerText = `camera.lookAt(${lookTarget.x.toFixed(2)}, ${lookTarget.y.toFixed(2)}, ${lookTarget.z.toFixed(2)})`;
+  }
   
   lightPivot.rotation.y += 0.002;
   renderer.render(scene, camera);
@@ -1542,16 +1584,16 @@ function getCameraLookAtTarget(camera, distance = 10) {
   return pos.add(dir.multiplyScalar(distance));
 }
 
-// const lookAtTarget = getCameraLookAtTarget(camera);
-// console.log('Use in preset:');
-// console.log(`camera.lookAt(${lookAtTarget.x.toFixed(2)}, ${lookAtTarget.y.toFixed(2)}, ${lookAtTarget.z.toFixed(2)})`);
+const lookAtTarget = getCameraLookAtTarget(camera);
+console.log('Use in preset:');
+console.log(`camera.lookAt(${lookAtTarget.x.toFixed(2)}, ${lookAtTarget.y.toFixed(2)}, ${lookAtTarget.z.toFixed(2)})`);
 
 
-// document.addEventListener('keydown', (e) => {
-//   if (e.key === "c") {
-//     showCameraInfo = !showCameraInfo;
-//     camInfo.style.display = showCameraInfo ? 'block' : 'none';
-//   }
-// });
+document.addEventListener('keydown', (e) => {
+  if (e.key === "c") {
+    showCameraInfo = !showCameraInfo;
+    camInfo.style.display = showCameraInfo ? 'block' : 'none';
+  }
+});
 
 renderer.setAnimationLoop(animate);
