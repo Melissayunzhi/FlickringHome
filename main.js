@@ -45,8 +45,8 @@ document.body.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 500);
-camera.position.set(4, 10, 20);
-camera.lookAt(0, 0, 30);
+camera.position.set(5, 8, 15);
+camera.lookAt(0, 3, 0);
 camera.fov = 34;
 camera.updateProjectionMatrix();
 
@@ -1414,6 +1414,14 @@ const buttonStyles = `
   z-index: 100;
   margin: 4px;
   padding: 5px 10px;
+  font-size: 14px;
+  font-family: IBM Plex Mono, monospace;
+  padding: 5px 10px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+
 `;
 
 ['overview', 'sofa view', 'bed view'].forEach((label, i) => {
@@ -1539,6 +1547,47 @@ function animateObjects() {
     });
   }
 }
+const aboutBtn = document.getElementById('aboutBtn');
+const aboutPopup = document.getElementById('aboutPopup');
+
+// When mouse enters the button area
+aboutBtn.addEventListener('mouseenter', () => {
+  aboutPopup.style.opacity = 1;
+  aboutPopup.style.pointerEvents = 'auto';
+});
+
+// When mouse leaves the button
+aboutBtn.addEventListener('mouseleave', () => {
+  aboutPopup.style.opacity = 0;
+  aboutPopup.style.pointerEvents = 'none';
+});
+
+
+let idleTimer;
+let idleTime = 10 * 1000; // 30 seconds
+let autoViewInterval;
+let currentView = 1;
+
+// Set up event listeners to detect activity
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  clearInterval(autoViewInterval);
+  idleTimer = setTimeout(startAutoViews, idleTime);
+}
+
+['mousemove', 'keydown', 'click', 'touchstart'].forEach(event => {
+  document.addEventListener(event, resetIdleTimer);
+});
+
+function startAutoViews() {
+  autoViewInterval = setInterval(() => {
+    currentView = (currentView + 1) % 3; // Cycle through 0,1,2
+    setCameraView(currentView);
+  }, 5000); // Switch every 5 seconds
+}
+
+// Initially start watching for idle
+resetIdleTimer();
 
 function animate(time) {
   const delta = clock.getDelta();
@@ -1590,7 +1639,7 @@ console.log(`camera.lookAt(${lookAtTarget.x.toFixed(2)}, ${lookAtTarget.y.toFixe
 
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === "c") {
+  if (e.key === "`") {
     showCameraInfo = !showCameraInfo;
     camInfo.style.display = showCameraInfo ? 'block' : 'none';
   }
