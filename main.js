@@ -913,6 +913,26 @@ loader.load(
       (error) => console.error('An error occurred while loading the door block model:', error)
     );
 
+    // PRELOAD small random textures to act as placeholders
+const preloadTextures = [];
+const preloadTextureLoader = new THREE.TextureLoader();
+const preloadImageUrls = [
+  '8255126084_6d45f908a3_b.jpg',
+  '8263652156_ccfd570da4_b.jpg',
+  '8266771300_4491a05dba_b.jpg',
+  // add 2–3 lightweight placeholder images here (small JPGs)
+];
+
+preloadImageUrls.forEach(url => {
+  const texture = preloadTextureLoader.load(url);
+  preloadTextures.push(texture);
+});
+
+// Helper to get a random preloaded texture
+function getRandomPreloadedTexture() {
+  const randomIndex = Math.floor(Math.random() * preloadTextures.length);
+  return preloadTextures[randomIndex];
+}
 
 // async function fetchRandomPhoto() {
 //   const randomPage = Math.floor(Math.random() * 10) + 1;
@@ -933,6 +953,7 @@ loader.load(
 //   }
 //   return null;
 // }
+
 async function fetchRandomPhoto() {
   const randomPage = Math.floor(Math.random() * 10) + 1;
   const apiUrl = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=home&min_upload_date=2004-01-01&max_upload_date=2012-12-31&sort=interestingness-desc&format=json&nojsoncallback=1&per_page=50&page=${randomPage}`;
@@ -946,18 +967,19 @@ async function fetchRandomPhoto() {
       const randomIndex = Math.floor(Math.random() * photos.length);
       const photo = photos[randomIndex];
       const imageUrl = `https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg`;
-      console.log("Fetched faster random photo:", imageUrl);
       return imageUrl;
     }
   } catch (error) {
-    console.error("Error fetching faster random photo:", error);
+    console.error("Error fetching home-tagged photo:", error);
   }
   return null;
 }
 
 
 
-const placeholderTexture = new THREE.TextureLoader().load('path/to/placeholder.jpg'); // Provide a valid local path if needed
+
+
+
 
 async function applyPhotoToWall(mesh) {
   const imageUrl = await fetchRandomPhoto();
@@ -1144,70 +1166,52 @@ async function setFlickrBackground() {
   }
 }
 
-function startLoadingEffect() {
-  renderer.domElement.classList.add('blurred');
-}
-
-function stopLoadingEffect() {
-  renderer.domElement.classList.remove('blurred');
-}
 
 
 async function applyFlickrTextureToGLB(object) {
-  startLoadingEffect(); // <-- start blur when beginning to load
+  const preloadedTexture = getRandomPreloadedTexture(); // pick random preloaded
+  const textureLoader = new THREE.TextureLoader();
 
-    const imageUrl = await fetchRandomPhoto();
-    if (!imageUrl) {
-      stopLoadingEffect();
-
-      console.warn("No image URL returned from fetchRandomPhoto().");
-      return;
+  object.traverse((child) => {
+    if (child.isMesh) {
+      // Apply preloaded placeholder immediately
+      child.material = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        map: preloadedTexture
+      });
+      child.material.needsUpdate = true;
     }
-    
-    console.log("applyFlickrTextureToGLB - received URL:", imageUrl);
-    
-    const textureLoader = new THREE.TextureLoader();
-    
-    object.traverse((child) => {
-      if (child.isMesh) {
-        console.log("Updating mesh material for child:", child.name);
-        
-        // For testing, try using a MeshBasicMaterial to ignore lighting effects.
-        child.material = new THREE.MeshStandardMaterial({
-          color: 0xffffff
-        });
-        
-        textureLoader.load(
-          imageUrl,
-          (texture) => {
-            console.log("Texture loaded, applying to:", child.name);
-            if (object === sofaModel  || isDescendant(child, windowModel)) {
-                texture.center.set(0.5, 0.5);  // Set the pivot to the texture's center
-                texture.rotation = Math.PI ; // Random rotation between 0 and 360 degrees
-              }
+  });
 
-            texture.encoding = THREE.sRGBEncoding;
-            child.material.map = texture;
-            child.material.needsUpdate = true;
-            stopLoadingEffect(); // <-- remove blur after loaded
-
-            // Log the material's map to verify it's not null.
-            console.log("child.material.map:", child.material.map);
-          },
-          undefined,
+  // Now fetch real texture
+  const imageUrl = await fetchRandomPhoto();
+  if (!imageUrl) {
+    console.warn("No image URL returned from fetchRandomPhoto().");
+    return;
+  }
+  
+  object.traverse((child) => {
+    if (child.isMesh) {
+      textureLoader.load(
+        imageUrl,
+        (texture) => {
+          texture.encoding = THREE.sRGBEncoding;
+          if (object === sofaModel || isDescendant(child, windowModel)) {
+            texture.center.set(0.5, 0.5);
+            texture.rotation = Math.PI;
+          }
+          child.material.map = texture;
+          child.material.needsUpdate = true;
+        },
+        undefined,
         (err) => {
           console.error("Error loading flickr texture:", err);
-          stopLoadingEffect(); // <-- remove blur if error too
         }
-        );
-        
-        // Optionally, check if the mesh has valid UV coordinates:
-        if (!child.geometry.attributes.uv) {
-          console.warn("Mesh", child.name, "has no UV coordinates!");
-        }
-      }
-    });
-  }
+      );
+    }
+  });
+}
+
   
 function highlightObject(object) {
   if (!object || object === previousObject) return;
@@ -1246,18 +1250,13 @@ function applyFlickrTextureToMesh(child) {
   }
   
   async function fetchTagPhoto(tag) {
-    const baseUrl = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=${tag}&min_upload_date=2004-01-01&max_upload_date=2012-12-31&format=json&nojsoncallback=1&per_page=50&sort=random`;
+    const randomPage = Math.floor(Math.random() * 10) + 1;
+    const apiUrl = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=${tag}&min_upload_date=2004-01-01&max_upload_date=2012-12-31&sort=interestingness-desc&format=json&nojsoncallback=1&per_page=50&page=${randomPage}`;
   
     try {
-      const initialResponse = await fetch(baseUrl + `&page=1`);
-      const initialData = await initialResponse.json();
-      const totalPages = Math.min(initialData.photos.pages, 4000 / 50); // Flickr limits
-  
-      const randomPage = Math.floor(Math.random() * totalPages) + 1;
-      const response = await fetch(baseUrl + `&page=${randomPage}`);
+      const response = await fetch(apiUrl);
       const data = await response.json();
       const photos = data.photos.photo;
-  
       if (photos.length > 0) {
         const randomIndex = Math.floor(Math.random() * photos.length);
         const photo = photos[randomIndex];
@@ -1266,10 +1265,12 @@ function applyFlickrTextureToMesh(child) {
         return imageUrl;
       }
     } catch (error) {
-      console.error(`Error fetching Flickr photo for tag "${tag}":`, error);
+      console.error("Error fetching Flickr photo for tag", tag, ":", error);
     }
     return null;
   }
+  
+  
   
   function applyPhotoToFloor(mesh) {
     fetchTagPhoto("flooring").then((imageUrl) => {
